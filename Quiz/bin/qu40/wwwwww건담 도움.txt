@@ -1,0 +1,162 @@
+﻿package quiz40;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class RegexQuiz {
+
+	public static void main(String[] args) {
+		/*
+		 * 건담 읽어들이고
+		 * 1. day, store, grade, datail, price를 멤버로 갖는 Product클래스를 생성합니다
+		 * 2. getter, setter를 선언합니다
+		 * 3. product를 제네릭으로 갖는 ArrayList 생성
+		 * 4. bufferedReader를 통해서 건담.txt파일을 읽어들입니다.
+		 * 5. while문 안에서는 readLine()메서드를 이용해서 한줄씩 읽도록 처리합니다
+		 * 6. 날짜, 지점, 등급, 상세, 가격 패턴분석을 통해서 Product에 저장후 리스트에 추가합니다.
+		 * 
+		 * 7. 외부 라이브러리를 사용햇 분석한 패턴은 xlsx액셀 파일로 추출합니다.
+		 */
+		List<Product> list = new ArrayList<>();
+		FileInputStream fis = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
+
+		String str = "20180311-01-0079201803112 건담베이스 부천점 [RG] HACO ROOM 꼬마곰 재키 키트 1 15,500원";
+		String pattern1 = "\\d+-\\d+-\\d+";
+//		String pattern1 = "\\d{8}-\\d{2}-\\d{12,13}";
+		String pattern2 = "\\건담베이스\\s[가-힣]+|\\건담\\s[가-힣]+";
+//		String pattern2 = "[가-힣]+ [가-힣]+";
+		String pattern3 = "\\[[가-힣]+\\]|\\[\\w+\\]";
+//		String pattern3 = "\\[[A-Z가-힣]*\\]";
+		String pattern5 = "\\d+,*\\d+원";
+//		String pattern5 = "\\d+,*\\d+원";
+
+		try {
+			fis = new FileInputStream("D:\\course\\java\\workspace\\quiz\\src\\quiz40\\건담.txt");
+			isr = new InputStreamReader(fis,"UTF-8");
+			br = new BufferedReader(isr);
+
+			while((str = br.readLine()) != null) {
+				Product p = new Product();
+				System.out.println(str);
+
+				String str1;
+				String str2;
+				String str3;
+				String str4 = str;
+				String str5;
+
+				Matcher m1 = Pattern.compile(pattern1).matcher(str);
+				Matcher m2 = Pattern.compile(pattern2).matcher(str);
+				Matcher m3 = Pattern.compile(pattern3).matcher(str);
+				Matcher m5 = Pattern.compile(pattern5).matcher(str);
+				m1.find();
+				str1 = m1.group();
+				m2.find();
+				str2 = m2.group();
+				m3.find();
+				str3 = m3.group();
+				m5.find();
+				str5 = m5.group();
+
+				//substring으로 앞 문자 끝인덱스 + 1(str3.end()+1) 뒷문자 시작인덱스 -1(str5.start()-1) 사이 추출
+				
+				str4 = str4.replace(str1, "");
+				str4 = str4.replace(str2, "");
+				str4 = str4.replace(str3, "");
+				str4 = str4.replace(str5, "");
+				str4 = str4.trim();
+				System.out.print(str1);
+				System.out.print(",");
+				System.out.print(str2);
+				System.out.print(",");
+				System.out.print(str3);
+				System.out.print(",");
+				System.out.print(str4);
+				System.out.print(",");
+				System.out.print(str5);
+				System.out.println();
+
+				p.setDay(str1);
+				p.setStore(str2);
+				p.setGrade(str3);
+				p.setDetail(str4);
+				p.setPrice(str5);
+
+				list.add(p);
+			}
+
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println();
+
+			for(int i = 0; i < list.size(); i++) {
+				System.out.println(list.get(i).getDay() + " " + list.get(i).getStore() + " " +list.get(i).getGrade().trim() + " " + list.get(i).getDetail().trim() + " " +list.get(i).getPrice());
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		int rowIdx = 0;
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet();
+		XSSFRow row = sheet.createRow(rowIdx);
+		XSSFCell cell;
+
+		row = sheet.createRow(rowIdx++);
+
+		String[] arrHeader = {"day", "store", "grade", "detail", "price"};
+
+		for(int i = 0; i < arrHeader.length; i++) {
+			cell = row.createCell(i);
+			cell.setCellValue(arrHeader[i]);
+		}
+
+		for(int i = 0; i < list.size(); i++) {
+			row = sheet.createRow(rowIdx++);
+			String[] arrCell = {list.get(i).getDay(), list.get(i).getStore(), list.get(i).getGrade(), list.get(i).getDetail(), list.get(i).getPrice()};
+
+			for(int j = 0; j < arrHeader.length; j++) {
+				cell = row.createCell(j);
+				cell.setCellValue(arrCell[j]);
+			}
+		}
+		File file = new File("C:\\Users\\KGITBANK\\Desktop\\ttttt.xlsx");
+		FileOutputStream fos = null;
+		
+		try {
+			fos = new FileOutputStream(file);
+			workbook.write(fos);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				workbook.close();
+				fos.close();
+			}
+			catch(Exception e) {
+
+			}
+		}
+	}
+
+}

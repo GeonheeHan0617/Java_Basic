@@ -1,0 +1,195 @@
+
+/* Drop Tables */
+
+DROP TABLE ATTENDNO CASCADE CONSTRAINTS;
+DROP TABLE COUNSULTYPE CASCADE CONSTRAINTS;
+DROP TABLE COUNSULDAY CASCADE CONSTRAINTS;
+DROP TABLE LECTUREENROLL CASCADE CONSTRAINTS;
+DROP TABLE NEW_TABLE CASCADE CONSTRAINTS;
+DROP TABLE TRAINNINGSITUATION CASCADE CONSTRAINTS;
+DROP TABLE RECODDAY CASCADE CONSTRAINTS;
+DROP TABLE LECTURETABLE CASCADE CONSTRAINTS;
+DROP TABLE LETURETYPE CASCADE CONSTRAINTS;
+DROP TABLE STUDENTSMEMBER CASCADE CONSTRAINTS;
+
+
+
+
+/* Create Tables */
+
+CREATE TABLE ATTENDNO
+(
+	attendrecord varchar2(5) NOT NULL,
+	DAY varchar2(10),
+	lecturecode varchar2(20) NOT NULL,
+	id varchar2(20) NOT NULL,
+	PRIMARY KEY (attendrecord, lecturecode, id)
+);
+
+
+CREATE TABLE COUNSULDAY
+(
+	id varchar2(20) NOT NULL,
+	lecturecode varchar2(20) NOT NULL,
+	STARTDATE date DEFAULT '20/03/20',
+	name varchar2(20) NOT NULL,
+	PRIMARY KEY (name)
+);
+
+
+CREATE TABLE COUNSULTYPE
+(
+	consultype varchar2(10),
+	name varchar2(20) NOT NULL,
+	PRIMARY KEY (name)
+);
+
+
+CREATE TABLE LECTUREENROLL
+(
+	lecturecode varchar2(20) NOT NULL,
+	enrollday date DEFAULT <신청일> NOT NULL,
+	rate varchar2(5) NOT NULL,
+	id varchar2(20) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+
+CREATE TABLE LECTURETABLE
+(
+	lecturecode varchar2(20) NOT NULL,
+	lecturename varchar2(20) NOT NULL,
+	professorname varchar2(20) NOT NULL,
+	STARTDATE date DEFAULT '20/03/02',
+	ENDDATE date DEFAULT '20/06/21',
+	recruitment number(5) NOT NULL,
+	dayweek varchar2(10) NOT NULL,
+	leturecode varchar2(10) NOT NULL,
+	PRIMARY KEY (lecturecode)
+);
+
+
+CREATE TABLE LETURETYPE
+(
+	weektype varchar2(10) NOT NULL,
+	national1 varchar2(10) NOT NULL,
+	DAY varchar2(10),
+	leturecode varchar2(10) NOT NULL,
+	PRIMARY KEY (leturecode)
+);
+
+
+CREATE TABLE NEW_TABLE
+(
+	lecturecode varchar2(20) NOT NULL,
+	id varchar2(20) NOT NULL,
+	regdate date
+);
+
+
+CREATE TABLE RECODDAY
+(
+	writerday date,
+	enrollment varchar2(10) NOT NULL,
+	absence varchar2(10) NOT NULL,
+	peculiarities varchar2(10) NOT NULL,
+	approval varchar2(10) NOT NULL,
+	lecturecode varchar2(20) NOT NULL,
+	PRIMARY KEY (lecturecode)
+);
+
+
+CREATE TABLE STUDENTSMEMBER
+(
+	id varchar2(20) NOT NULL,
+	pw varchar2(20) NOT NULL,
+	studentsnum number(6),
+	name varchar2(20) NOT NULL,
+	phonenumber varchar2(10) NOT NULL,
+	rate varchar2(5) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+
+CREATE TABLE TRAINNINGSITUATION
+(
+	leturetime varchar2(3) NOT NULL,
+	teatuer varchar2(10) NOT NULL,
+	lecturename varchar2(20) NOT NULL,
+	content varchar2(200) NOT NULL,
+	lecturecode varchar2(20) NOT NULL,
+	studentsnum number(6) NOT NULL,
+	PRIMARY KEY (lecturecode)
+);
+
+
+
+/* Create Foreign Keys */
+
+ALTER TABLE COUNSULTYPE
+	ADD FOREIGN KEY (name)
+	REFERENCES COUNSULDAY (name)
+;
+
+
+ALTER TABLE COUNSULDAY
+	ADD FOREIGN KEY (lecturecode)
+	REFERENCES LECTURETABLE (lecturecode)
+;
+
+
+ALTER TABLE NEW_TABLE
+	ADD FOREIGN KEY (lecturecode)
+	REFERENCES LECTURETABLE (lecturecode)
+;
+
+
+ALTER TABLE RECODDAY
+	ADD FOREIGN KEY (lecturecode)
+	REFERENCES LECTURETABLE (lecturecode)
+;
+
+
+ALTER TABLE LECTURETABLE
+	ADD FOREIGN KEY (leturecode)
+	REFERENCES LETURETYPE (leturecode)
+;
+
+
+ALTER TABLE ATTENDNO
+	ADD FOREIGN KEY (lecturecode)
+	REFERENCES RECODDAY (lecturecode)
+;
+
+
+ALTER TABLE TRAINNINGSITUATION
+	ADD FOREIGN KEY (lecturecode)
+	REFERENCES RECODDAY (lecturecode)
+;
+
+
+ALTER TABLE ATTENDNO
+	ADD FOREIGN KEY (id)
+	REFERENCES STUDENTSMEMBER (id)
+;
+
+
+ALTER TABLE COUNSULDAY
+	ADD FOREIGN KEY (id)
+	REFERENCES STUDENTSMEMBER (id)
+;
+
+
+ALTER TABLE LECTUREENROLL
+	ADD FOREIGN KEY (id)
+	REFERENCES STUDENTSMEMBER (id)
+;
+
+
+ALTER TABLE NEW_TABLE
+	ADD FOREIGN KEY (id)
+	REFERENCES STUDENTSMEMBER (id)
+;
+
+
+
